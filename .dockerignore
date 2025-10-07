@@ -9,7 +9,7 @@ __pycache__/
 *.log
 
 # Pesados de entrenamiento/outputs locales
-runs/
+# runs/  <- NO ignorar completo para incluir pesos necesarios
 uploads/
 outputs/
 
@@ -22,7 +22,7 @@ Modelo/Scripts/
 Modelo/share/
 Modelo/outputs/
 Modelo/uploads/
-Modelo/runs/
+# Modelo/runs/  <- NO ignorar completo porque contiene pesos requeridos
 Modelo/**/train/
 Modelo/**/valid/
 Modelo/**/test/
