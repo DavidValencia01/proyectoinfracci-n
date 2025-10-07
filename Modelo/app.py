@@ -19,7 +19,8 @@ if sys.platform.startswith("win"):
 
 # Añadir site-packages local para importar cv2/ultralytics cuando se ejecuta con Python del sistema
 BASE_DIR = Path(__file__).parent
-sys.path.append(str(BASE_DIR / "Lib" / "site-packages"))
+if sys.platform.startswith("win"):
+    sys.path.append(str(BASE_DIR / "Lib" / "site-packages"))
 
 # Importar lógica existente de procesamiento
 from procesar_multi_modelo import procesar_video_multi
