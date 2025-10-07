@@ -1,0 +1,13 @@
+train: ../train/images
+val: ../valid/images
+test: ../test/images
+
+nc: 1
+names: ['crosswalk']
+
+roboflow:
+  workspace: tom-lai-8bp7n
+  project: crosswalk-xlzhu
+  version: 6
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/tom-lai-8bp7n/crosswalk-xlzhu/dataset/6

@@ -1,0 +1,13 @@
+train: C:/Users/renzo/Desktop/Modelo/PlateCharacters.v1i.yolov8/train/images
+val: C:/Users/renzo/Desktop/Modelo/PlateCharacters.v1i.yolov8/valid/images
+test: C:/Users/renzo/Desktop/Modelo/PlateCharacters.v1i.yolov8/test/images
+
+nc: 36
+names: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+
+roboflow:
+  workspace: grupo-6-placas
+  project: plate-characters-qti3l
+  version: 1
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/grupo-6-placas/plate-characters-qti3l/dataset/1

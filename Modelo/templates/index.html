@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Detección de Infracciones - YOLOv8</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #070707;
+      --panel: #0b0b0b;
+      --panel-2: #101010;
+      --border: #1a1a1a;
+      --text: #FFFFFF;
+      --muted: #d1d5db;
+      --primary: #12DCEF;
+      --primary-2: #5DFFD9;
+      --secondary: #222222;
+      --accent: #33BC65;
+      --success: #33BC65;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+    }
+    .theme-light {
+      --bg: #FFFFFF;
+      --panel: #FFFFFF;
+      --panel-2: #f4f4f4;
+      --border: #e5e7eb;
+      --text: #070707;
+      --muted: #4b5563;
+      --primary: #12DCEF;
+      --primary-2: #5DFFD9;
+      --secondary: #e9e9e9;
+      --accent: #33BC65;
+      --success: #33BC65;
+      --warning: #d97706;
+      --danger: #dc2626;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: "Neue Montreal", "Inter", "Helvetica Neue", Arial, system-ui, -apple-system, sans-serif;
+      margin: 0; color: var(--text);
+      background:
+        radial-gradient(1200px 600px at 10% -20%, rgba(51,188,101,0.18), transparent),
+        radial-gradient(1200px 600px at 90% 10%, rgba(18,220,239,0.15), transparent),
+        var(--bg);
+    }
+    header {
+      padding: 28px; background: linear-gradient(180deg, rgba(17,24,39,0.9), rgba(17,24,39,0.6));
+      border-bottom: 1px solid var(--border);
+    }
+    header h1 { margin: 0 0 8px; font-size: 32px; letter-spacing: 0.2px; display: flex; align-items: center; gap: 10px; }
+    p.sub { margin: 0; color: var(--muted); }
+    main { max-width: 1060px; margin: 0 auto; padding: 24px; }
+
+    .navbar { position: sticky; top: 0; z-index: 50; display: flex; align-items: center; justify-content: space-between; padding: 12px 24px; background: linear-gradient(180deg, rgba(17,24,39,0.95), rgba(17,24,39,0.8)); border-bottom: 1px solid var(--border); }
+    .navbar .brand { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; color: var(--text); text-decoration: none; }
+    .navbar .links { display: flex; gap: 10px; align-items: center; }
+    .navbar .links a { color: var(--text); text-decoration: none; padding: 8px 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--panel-2); }
+    .navbar .links a:hover { border-color: #334155; }
+    .theme-toggle { background: linear-gradient(180deg, var(--secondary), #4b5563); color: white; border: none; padding: 8px 12px; border-radius: 10px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
+
+    .card { background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 22px; margin-top: 24px;
+      box-shadow: 0 10px 25px rgba(2, 6, 23, 0.6); transition: border-color .2s ease, transform .2s ease; }
+    .card:hover { border-color: #334155; }
+
+    h3 { margin-top: 0; margin-bottom: 12px; font-size: 20px; }
+    h4 { margin: 0 0 8px; font-size: 16px; color: var(--muted); }
+
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+
+    .models { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+    .model { display: flex; align-items: center; gap: 10px; padding: 12px; border: 1px solid var(--border); border-radius: 12px; background: var(--panel-2);
+      transition: border-color .2s ease, background-color .2s ease; }
+    .model:hover { border-color: #334155; background: #0f1f38; }
+    .model input { width: 18px; height: 18px; }
+
+    .upload { border: 2px dashed #334155; border-radius: 14px; padding: 24px; text-align: center; background: var(--panel-2); position: relative; overflow: hidden; }
+    .upload small { color: var(--muted); }
+
+    .actions { margin-top: 16px; display: flex; gap: 10px; }
+    button { background: linear-gradient(180deg, var(--primary), var(--primary-2)); color: white; border: none; padding: 10px 16px; border-radius: 12px; cursor: pointer; font-weight: 600;
+      display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 6px 16px rgba(30, 58, 138, 0.4); transition: transform .06s ease, filter .2s ease; }
+    button:hover { filter: brightness(1.05); }
+    button:active { transform: translateY(1px); }
+    button.secondary { background: linear-gradient(180deg, var(--secondary), #4b5563); box-shadow: 0 6px 16px rgba(15, 23, 42, 0.5); }
+
+    .btn-icon { width: 18px; height: 18px; display: inline-block; }
+    .icon { display: inline-flex; width: 24px; height: 24px; align-items: center; justify-content: center; }
+    .icon svg { display: block; width: 100%; height: 100%; }
+
+    .error { background: #7f1d1d; color: #fecaca; border: 1px solid #b91c1c; padding: 12px; border-radius: 8px; margin-top: 12px; }
+
+    video { width: 100%; border-radius: 14px; border: 1px solid var(--border); box-shadow: 0 10px 24px rgba(2,6,23,0.6); }
+
+    .stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 12px; }
+    .stat { background: var(--panel-2); border: 1px solid var(--border); border-radius: 12px; padding: 12px; }
+
+    .chip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; background: var(--panel-2); border: 1px solid var(--border); border-radius: 9999px; color: #93c5fd; text-decoration: none; }
+    .chip:hover { border-color: #334155; }
+    .chip-icon { width: 18px; height: 18px; display: inline-flex; }
+
+    footer { text-align: center; color: var(--muted); padding: 18px; }
+    a { color: #93c5fd; }
+
+    /* Overlay de progreso */
+    #progressOverlay { position: fixed; inset: 0; background: rgba(2,6,23,0.75); display: none; align-items: center; justify-content: center; z-index: 100; }
+    #progressOverlay.show { display: flex; }
+    .overlay-card { background: var(--panel); border: 1px solid var(--border); border-radius: 14px; padding: 18px 22px; width: 360px; text-align: center; box-shadow: 0 10px 24px rgba(2,6,23,0.6); }
+    .spinner { width: 36px; height: 36px; border-radius: 50%; border: 3px solid var(--border); border-top-color: var(--primary); animation: spin .9s linear infinite; margin: 0 auto 12px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+
+    @media (max-width: 860px) { .grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <header>
+    <nav class="navbar" aria-label="Barra de navegación">
+      <a class="brand" href="#">
+        <span class="icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 7h18M5 7l2 10h10l2-10" stroke="#60a5fa" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="12" cy="12" r="3" fill="#22d3ee" />
+          </svg>
+        </span>
+        Detección de Infracciones
+      </a>
+      <div class="links">
+        <a href="/deteccion">Detección</a>
+        <a href="/infraccion">Infracción</a>
+        <a href="#resultados">Resultados</a>
+        <button id="themeToggle" class="theme-toggle" type="button">
+          <span class="btn-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 3v2m0 14v2M3 12h2m14 0h2M5.64 5.64l1.41 1.41m9.9 9.9l1.41 1.41M5.64 18.36l1.41-1.41m9.9-9.9l1.41-1.41" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+          Tema
+        </button>
+      </div>
+    </nav>
+    <h1>
+      <span class="icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M3 7h18M5 7l2 10h10l2-10" stroke="#60a5fa" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="12" cy="12" r="3" fill="#22d3ee" />
+        </svg>
+      </span>
+      Detección de Infracciones de Tránsito
+    </h1>
+    <p class="sub">Sube un video, selecciona los modelos y procesa con YOLOv8</p>
+  </header>
+  <main>
+    <section class="card">
+      <form action="/process" method="post" enctype="multipart/form-data">
+        <div class="grid">
+          <div>
+      <h3>Modelos disponibles</h3>
+            <div class="models">
+              {% for m in available_models %}
+              <label class="model">
+                <input type="checkbox" name="opciones" value="{{ m.key }}" />
+                <span>{{ m.label }}</span>
+              </label>
+              {% endfor %}
+            </div>
+          </div>
+          <div>
+            <h3>Subir video</h3>
+            <div class="upload">
+              <input type="file" name="file" accept="video/*" required />
+              <small>Formatos soportados: mp4, mov, avi, mkv</small>
+            </div>
+          </div>
+        </div>
+        <div class="actions">
+          <button type="submit"><span class="btn-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 12h14M12 5l7 7-7 7" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></span> Procesar</button>
+          <button type="reset" class="secondary"><span class="btn-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 6l12 12M18 6L6 18" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></span> Limpiar</button>
+        </div>
+        {% if error %}
+          <div class="error">{{ error }}</div>
+        {% endif %}
+      </form>
+    </section>
+
+    {% if result_video_path %}
+    <section class="card">
+      <h3>Resultado</h3>
+      <video controls src="{{ result_video_path }}"></video>
+      {% if counters %}
+      <div class="stats">
+        {% for k, v in counters.items() %}
+        <div class="stat">
+          <strong>{{ k|capitalize }}</strong>
+          <div>{{ v }} detecciones</div>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </section>
+    {% endif %}
+
+    <section class="card">
+      <h3>Detección de Infracciones</h3>
+      <form action="/procesar_infraccion" method="post" enctype="multipart/form-data">
+        <div class="grid">
+          <div>
+            <h4>Tipo de infracción</h4>
+            <div class="models">
+              <label class="model">
+                <span class="chip"><span class="chip-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 12h16" stroke="#60a5fa" stroke-width="1.5" stroke-linecap="round"/><circle cx="12" cy="12" r="3" fill="#22d3ee"/></svg></span> Cruce Peatonal</span>
+                <input type="radio" name="tipo" value="cruce" checked />
+              </label>
+              <label class="model">
+                <span class="chip"><span class="chip-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="9" y="3" width="6" height="18" rx="3" stroke="#f59e0b" stroke-width="1.5"/><circle cx="12" cy="8" r="2.2" fill="#ef4444"/><circle cx="12" cy="12" r="2.2" fill="#f59e0b"/><circle cx="12" cy="16" r="2.2" fill="#22c55e"/></svg></span> Semáforo Rojo/Amarillo</span>
+                <input type="radio" name="tipo" value="semaforo" />
+              </label>
+            </div>
+          </div>
+          <div>
+            <h4>Subir video</h4>
+            <div class="upload">
+              <input type="file" name="file" accept="video/*" required />
+              <small>Incluye tolerancia (segundos) para semáforo si aplica.</small>
+              <div style="margin-top:8px">
+                <label>Tolerancia (segundos): </label>
+                <input type="number" step="0.1" min="0" name="tolerancia" placeholder="1.0" style="width:120px" />
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="actions">
+          <button type="submit"><span class="btn-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 12h14M12 5l7 7-7 7" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></span> Procesar Infracción</button>
+          <button type="reset" class="secondary"><span class="btn-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 6l12 12M18 6L6 18" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg></span> Limpiar</button>
+        </div>
+        {% if error %}
+          <div class="error">{{ error }}</div>
+        {% endif %}
+      </form>
+    </section>
+
+    {% if infraction_result_video_path %}
+    <section class="card">
+      <h3>Resultado de Infracción</h3>
+      <video controls src="{{ infraction_result_video_path }}"></video>
+      {% if infraction_counters %}
+      <div class="stats">
+        <div class="stat">
+          <strong>Total de infracciones</strong>
+          <div>{{ infraction_counters.get('infracciones', 0) }}</div>
+        </div>
+        <div class="stat">
+          <strong>Evidencias guardadas</strong>
+          <div>{{ infraction_counters.get('evidencias', []) | length }}</div>
+        </div>
+      </div>
+      {% endif %}
+      {% if infraction_evidences and infraction_evidences|length > 0 %}
+      <div style="margin-top:12px">
+        <h4>Evidencias</h4>
+        <div class="models">
+          {% for ev in infraction_evidences %}
+          <a class="chip" href="/files/{{ ev }}" target="_blank">
+            <span class="chip-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 12h12" stroke="#60a5fa" stroke-width="1.5" stroke-linecap="round"/><path d="M9 9l6 6" stroke="#22d3ee" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+            {{ ev }}
+          </a>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+    </section>
+    {% endif %}
+  </main>
+  <footer>
+    Construido con FastAPI y Jinja2. YOLOv8 por Ultralytics.
+  </footer>
+  <div id="progressOverlay" role="dialog" aria-modal="true" aria-labelledby="progressTitle">
+    <div class="overlay-card">
+      <div class="spinner" aria-hidden="true"></div>
+      <div id="progressTitle">Procesando video...</div>
+      <div class="sr-only">Por favor espera mientras procesamos tu video.</div>
+    </div>
+  </div>
+  <script>
+    // Toggle de tema claro/oscuro
+    (function() {
+      const body = document.body;
+      const key = 'theme-preference';
+      const toggleBtn = document.getElementById('themeToggle');
+      function applyTheme(theme) {
+        body.classList.toggle('theme-light', theme === 'light');
+      }
+      const saved = localStorage.getItem(key);
+      if (saved) applyTheme(saved);
+      if (toggleBtn) {
+        toggleBtn.addEventListener('click', () => {
+          const next = body.classList.contains('theme-light') ? 'dark' : 'light';
+          applyTheme(next);
+          localStorage.setItem(key, next);
+        });
+      }
+    })();
+
+    // Mostrar overlay de progreso al enviar formularios
+    (function() {
+      const overlay = document.getElementById('progressOverlay');
+      function showProgress() { overlay.classList.add('show'); }
+      function hideProgress() { overlay.classList.remove('show'); }
+      const forms = document.querySelectorAll('form[action="/process"], form[action="/procesar_infraccion"]');
+      forms.forEach(f => {
+        f.addEventListener('submit', function() {
+          showProgress();
+        });
+      });
+      // Ocultar overlay cuando la página se recarga con resultado
+      window.addEventListener('pageshow', hideProgress);
+    })();
+  </script>
+</body>
+</html>

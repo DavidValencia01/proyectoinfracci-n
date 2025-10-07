@@ -1,0 +1,13 @@
+train: C:/Users/renzo/Desktop/Modelo/PeruPlateNumbers.v3i.yolov8/train/images
+val: C:/Users/renzo/Desktop/Modelo/PeruPlateNumbers.v3i.yolov8/valid/images
+test: C:/Users/renzo/Desktop/Modelo/PeruPlateNumbers.v3i.yolov8/test/images
+
+nc: 1
+names: ['Placa']
+
+roboflow:
+  workspace: grupo-6-placas
+  project: peru-plate-numbers
+  version: 3
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/grupo-6-placas/peru-plate-numbers/dataset/3

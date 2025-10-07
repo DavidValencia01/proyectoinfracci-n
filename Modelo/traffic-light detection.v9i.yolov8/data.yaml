@@ -1,0 +1,13 @@
+train: ./train/images
+val: ./valid/images
+test: ./test/images
+
+nc: 3
+names: ['Green', 'Red', 'Yellow']
+
+roboflow:
+  workspace: capy-5cy71
+  project: traffic-light-detection-llnp8
+  version: 9
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/capy-5cy71/traffic-light-detection-llnp8/dataset/9

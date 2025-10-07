@@ -1,0 +1,13 @@
+train: ../train/images
+val: ../train/images
+test: ../train/images
+
+nc: 6
+names: ['bus', 'car', 'microbus', 'motorbike', 'pickup-van', 'truck']
+
+roboflow:
+  workspace: lynkeus03
+  project: vehicle-detection-by9xs
+  version: 3
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/lynkeus03/vehicle-detection-by9xs/dataset/3

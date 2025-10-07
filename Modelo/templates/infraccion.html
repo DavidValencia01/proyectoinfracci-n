@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Infracción - YOLOv8</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+:root { --bg: #070707; --panel: #0b0b0b; --panel-2: #101010; --border: #1a1a1a; --text: #FFFFFF; --muted: #d1d5db; --primary: #12DCEF; --primary-2: #5DFFD9; --secondary: #222222; --accent: #33BC65; --success: #33BC65; --warning: #f59e0b; --danger: #ef4444; }
+.theme-light { --bg: #FFFFFF; --panel: #FFFFFF; --panel-2: #f4f4f4; --border: #e5e7eb; --text: #070707; --muted: #4b5563; --primary: #12DCEF; --primary-2: #5DFFD9; --secondary: #e9e9e9; --accent: #33BC65; --success: #33BC65; --warning: #d97706; --danger: #dc2626; }
+    * { box-sizing: border-box; }
+    body { font-family: "Neue Montreal", "Inter", "Helvetica Neue", Arial, system-ui, -apple-system, sans-serif; margin: 0; color: var(--text);
+      background: radial-gradient(1200px 600px at 10% -20%, rgba(51,188,101,0.18), transparent), radial-gradient(1200px 600px at 90% 10%, rgba(18,220,239,0.15), transparent), var(--bg);
+    }
+    .navbar { position: sticky; top: 0; z-index: 50; display: flex; align-items: center; justify-content: space-between; padding: 12px 24px; background: linear-gradient(180deg, rgba(17,24,39,0.95), rgba(17,24,39,0.8)); border-bottom: 1px solid var(--border); }
+    .navbar .brand { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; color: var(--text); text-decoration: none; }
+    .navbar .links { display: flex; gap: 10px; align-items: center; }
+    .navbar .links a { color: var(--text); text-decoration: none; padding: 8px 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--panel-2); }
+    .navbar .links a:hover { border-color: #334155; }
+    .theme-toggle { background: linear-gradient(180deg, var(--secondary), #4b5563); color: white; border: none; padding: 8px 12px; border-radius: 10px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
+    header { padding: 20px; border-bottom: 1px solid var(--border); }
+    header h1 { margin: 0; font-size: 28px; }
+    main { max-width: 1060px; margin: 0 auto; padding: 24px; }
+    .card { background: var(--panel); border: 1px solid var(--border); border-radius: 16px; padding: 22px; margin-top: 24px; box-shadow: 0 10px 25px rgba(2, 6, 23, 0.6); }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .models { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+    .model { display: flex; align-items: center; gap: 10px; padding: 12px; border: 1px solid var(--border); border-radius: 12px; background: var(--panel-2); }
+    .upload { border: 2px dashed #334155; border-radius: 14px; padding: 24px; text-align: center; background: var(--panel-2); }
+    .actions { margin-top: 16px; display: flex; gap: 10px; }
+    button { background: linear-gradient(180deg, var(--primary), var(--primary-2)); color: white; border: none; padding: 10px 16px; border-radius: 12px; cursor: pointer; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; }
+    button.secondary { background: linear-gradient(180deg, var(--secondary), #4b5563); }
+    .error { background: #7f1d1d; color: #fecaca; border: 1px solid #b91c1c; padding: 12px; border-radius: 8px; margin-top: 12px; }
+    video { width: 100%; border-radius: 14px; border: 1px solid var(--border); box-shadow: 0 10px 24px rgba(2,6,23,0.6); }
+    .stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 12px; }
+    .stat { background: var(--panel-2); border: 1px solid var(--border); border-radius: 12px; padding: 12px; }
+    .chips { display:flex; gap:8px; flex-wrap: wrap; }
+    .chip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; background: var(--panel-2); border: 1px solid var(--border); border-radius: 9999px; color: #93c5fd; text-decoration: none; }
+    .chip:hover { border-color: #334155; }
+    .chip-icon { width: 18px; height: 18px; display: inline-flex; }
+    /* Overlay y toast */
+    #progressOverlay { position: fixed; inset: 0; background: rgba(2,6,23,0.75); display: none; align-items: center; justify-content: center; z-index: 100; }
+    #progressOverlay.show { display: flex; }
+    .overlay-card { background: var(--panel); border: 1px solid var(--border); border-radius: 14px; padding: 18px 22px; width: 380px; text-align: center; box-shadow: 0 10px 24px rgba(2,6,23,0.6); }
+    .spinner { width: 36px; height: 36px; border-radius: 50%; border: 3px solid var(--border); border-top-color: var(--primary); animation: spin .9s linear infinite; margin: 0 auto 12px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .progressbar { height: 10px; background: var(--panel-2); border: 1px solid var(--border); border-radius: 9999px; overflow: hidden; margin-top: 8px; }
+    .progressbar > div { height: 100%; width: 0%; background: linear-gradient(90deg, var(--primary), var(--primary-2)); transition: width .3s ease; }
+    .progress-info { margin-top: 8px; color: var(--muted); font-size: 14px; }
+    .toast-container { position: fixed; bottom: 16px; right: 16px; z-index: 200; }
+    .toast { display: none; background: var(--panel); border: 1px solid var(--border); color: var(--text); padding: 12px 16px; border-radius: 12px; box-shadow: 0 10px 24px rgba(2,6,23,0.6); }
+    .toast.show { display: block; }
+    @media (max-width: 860px) { .grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <nav class="navbar" aria-label="Barra de navegación">
+    <a class="brand" href="/infraccion">Infracción</a>
+    <div class="links">
+      <a href="/deteccion">Detección</a>
+      <a href="/infraccion">Infracción</a>
+      <button id="themeToggle" class="theme-toggle" type="button">Tema</button>
+    </div>
+  </nav>
+  <header>
+    <h1>Detección de Infracciones</h1>
+    <p class="sub">Cruce peatonal y Semáforo Rojo/Amarillo</p>
+  </header>
+
+  <main>
+    <section class="card">
+      <form id="formInfraccion" action="/procesar_infraccion" method="post" enctype="multipart/form-data">
+        <div class="grid">
+          <div>
+            <h3>Tipo de infracción</h3>
+            <div class="models">
+              <label class="model">
+                <span>Cruce Peatonal</span>
+                <input type="radio" name="tipo" value="cruce" checked />
+              </label>
+              <label class="model">
+                <span>Semáforo Rojo/Amarillo</span>
+                <input type="radio" name="tipo" value="semaforo" />
+              </label>
+            </div>
+            <div id="polygonOptions" class="models" style="margin-top:8px">
+              <label class="model">
+                <span>Polígono automático</span>
+                <input type="radio" name="poligono_modo" value="auto" checked />
+              </label>
+              <label class="model">
+                <span>Polígono manual</span>
+                <input type="radio" name="poligono_modo" value="manual" />
+              </label>
+              <small style="grid-column: 1 / -1; color: var(--muted)">En modo manual se abrirá una ventana para seleccionar 4 puntos del cruce peatonal.</small>
+            </div>
+          </div>
+          <div>
+            <h3>Subir video</h3>
+            <div class="upload">
+              <input id="fileInput" type="file" name="file" accept="video/*" required />
+              <small>La tolerancia para semáforo está fijada en 3.0 segundos.</small>
+            </div>
+          </div>
+        </div>
+        <div class="actions">
+          <button type="submit">Procesar Infracción</button>
+          <button type="reset" class="secondary">Limpiar</button>
+        </div>
+        {% if error %}
+          <div class="error">{{ error }}</div>
+        {% endif %}
+      </form>
+    </section>
+
+    {% if infraction_result_video_path %}
+    <section class="card">
+      <h3>Resultado de Infracción</h3>
+      <video controls preload="metadata" playsinline>
+        <source src="{{ infraction_result_video_path }}" type="video/mp4" />
+        Tu navegador no soporta la reproducción de video MP4.
+      </video>
+      {% if infraction_counters %}
+      <div class="stats">
+        <div class="stat">
+          <strong>Total de infracciones</strong>
+          <div>{{ infraction_counters.get('infracciones', 0) }}</div>
+        </div>
+        <div class="stat">
+          <strong>Evidencias guardadas</strong>
+          <div>{{ infraction_counters.get('evidencias', []) | length }}</div>
+        </div>
+      </div>
+      {% endif %}
+      {% if infraction_evidences %}
+      <div style="margin-top: 10px">
+        <strong>Evidencias</strong>
+        <div class="chips">
+          {% for e in infraction_evidences %}
+            <a class="chip" href="/files/{{ e }}" target="_blank"><span class="chip-icon" aria-hidden="true"></span>{{ e.split('/')[-1] }}</a>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+    </section>
+    {% endif %}
+  </main>
+
+  <!-- Overlay de progreso -->
+  <div id="progressOverlay" role="dialog" aria-modal="true" aria-label="Procesando video">
+    <div class="overlay-card">
+      <div class="spinner" aria-hidden="true"></div>
+      <div>Procesando video…</div>
+      <div class="progressbar" aria-label="Progreso estimado"><div id="progressBar"></div></div>
+      <div id="progressInfo" class="progress-info">Estimado: -- s</div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast-container"><div id="toast" class="toast">Procesamiento de infracción completado</div></div>
+
+  <script>
+    (function(){
+      const body = document.body;
+      const overlay = document.getElementById('progressOverlay');
+      const progressBar = document.getElementById('progressBar');
+      const progressInfo = document.getElementById('progressInfo');
+      const toast = document.getElementById('toast');
+      const themeToggle = document.getElementById('themeToggle');
+      const form = document.getElementById('formInfraccion');
+      const fileInput = document.getElementById('fileInput');
+      const polygonOptions = document.getElementById('polygonOptions');
+      let intervalId = null, start = 0, est = 60;
+
+      // Theme
+      try {
+        const saved = localStorage.getItem('theme');
+        if (saved === 'light') body.classList.add('theme-light');
+        themeToggle.addEventListener('click', () => {
+          body.classList.toggle('theme-light');
+          localStorage.setItem('theme', body.classList.contains('theme-light') ? 'light' : 'dark');
+        });
+      } catch(e){}
+
+      function estimateSecondsFromFile(f){
+        if(!f) return 60; const mb = f.size / (1024*1024);
+        if (mb < 20) return 45; if (mb < 50) return 90; if (mb < 200) return 180; return 300;
+      }
+      // Mostrar/ocultar opciones de polígono según tipo
+      function updatePolygonVisibility(){
+        const tipo = (new FormData(form).get('tipo')) || 'cruce';
+        polygonOptions.style.display = tipo === 'cruce' ? 'grid' : 'none';
+      }
+      form.addEventListener('change', (e)=>{
+        if (e.target && e.target.name === 'tipo') updatePolygonVisibility();
+      });
+      updatePolygonVisibility();
+
+      function startProgress(){
+        overlay.classList.add('show');
+        const f = fileInput.files && fileInput.files[0];
+        est = estimateSecondsFromFile(f);
+        start = Date.now();
+        if (intervalId) clearInterval(intervalId);
+        intervalId = setInterval(() => {
+          const elapsed = (Date.now() - start)/1000;
+          const pct = Math.min(99, Math.round((elapsed/est)*100));
+          progressBar.style.width = pct + '%';
+          const remain = Math.max(1, Math.round(est - elapsed));
+          progressInfo.textContent = 'Estimado: ' + remain + ' s';
+        }, 500);
+      }
+
+      form.addEventListener('submit', function(){ startProgress(); });
+      window.addEventListener('load', function(){ overlay.classList.remove('show'); if(intervalId) clearInterval(intervalId); });
+
+      // Toast si hay resultado
+      const hasResult = {{ (infraction_result_video_path is not none) | tojson }};
+      if (hasResult) {
+        toast.textContent = 'Procesamiento de infracción completado';
+        toast.classList.add('show');
+        setTimeout(()=> toast.classList.remove('show'), 4000);
+      }
+    })();
+  </script>
+</body>
+</html>
