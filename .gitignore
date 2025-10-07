@@ -9,7 +9,7 @@ Modelo/share/
 # Ignorar salidas y cargas locales
 Modelo/outputs/
 Modelo/uploads/
-Modelo/runs/
+# Modelo/runs/  <- NO ignorar entero porque contiene pesos requeridos
 
 # Ignorar datasets de entrenamiento (no necesarios para inferencia)
 Modelo/**/train/
