@@ -22,7 +22,10 @@ Modelo/Scripts/
 Modelo/share/
 Modelo/outputs/
 Modelo/uploads/
-# Modelo/runs/  <- NO ignorar completo porque contiene pesos requeridos
+# Ignorar todo en Modelo/runs excepto los pesos
+Modelo/runs/**
+!Modelo/runs/**/weights/**
+
 Modelo/**/train/
 Modelo/**/valid/
 Modelo/**/test/
