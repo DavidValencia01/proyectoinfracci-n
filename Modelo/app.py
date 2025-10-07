@@ -52,6 +52,11 @@ AVAILABLE_MODELS = [
 async def index(request: Request):
     return RedirectResponse("/deteccion", status_code=302)
 
+# Endpoint de salud para Render
+@app.get("/health")
+async def health():
+    return {"status": "ok"}
+
 @app.get("/deteccion", response_class=HTMLResponse)
 async def deteccion_page(request: Request):
     return templates.TemplateResponse(
