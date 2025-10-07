@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: infracciones-fastapi
+    env: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./Dockerfile
+    
+    autoDeploy: true
+    
+    healthCheckPath: /
+    
+    envVars:
+      - key: PORT
+        value: 8000
+      - key: UVICORN_WORKERS
+        value: "1"
