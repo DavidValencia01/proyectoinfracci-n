@@ -13,6 +13,21 @@ runs/
 uploads/
 outputs/
 
+# Ignorar carpetas pesadas dentro de Modelo
+Modelo/venv/
+Modelo/Lib/
+Modelo/__pycache__/
+Modelo/.vscode/
+Modelo/Scripts/
+Modelo/share/
+Modelo/outputs/
+Modelo/uploads/
+Modelo/runs/
+Modelo/**/train/
+Modelo/**/valid/
+Modelo/**/test/
+Modelo/**/train_processed/
+
 # Archivos del sistema
 .DS_Store
 Thumbs.db

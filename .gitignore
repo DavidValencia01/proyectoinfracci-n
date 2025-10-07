@@ -1,0 +1,27 @@
+# Ignorar entornos y caches dentro de Modelo
+Modelo/venv/
+Modelo/Lib/
+Modelo/__pycache__/
+Modelo/.vscode/
+Modelo/Scripts/
+Modelo/share/
+
+# Ignorar salidas y cargas locales
+Modelo/outputs/
+Modelo/uploads/
+Modelo/runs/
+
+# Ignorar datasets de entrenamiento (no necesarios para inferencia)
+Modelo/**/train/
+Modelo/**/valid/
+Modelo/**/test/
+Modelo/**/train_processed/
+
+# Archivos temporales
+*.pyc
+*.pyo
+*.pyd
+*.log
+*.tmp
+Thumbs.db
+.DS_Store
