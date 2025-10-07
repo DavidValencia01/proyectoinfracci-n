@@ -32,4 +32,4 @@ ENV PYTHONUNBUFFERED=1 \
 EXPOSE 8000
 
 # Comando de arranque
-CMD ["bash", "-lc", "uvicorn app:app --host 0.0.0.0 --port ${PORT}"]
+CMD ["bash", "-lc", "uvicorn app:app --host 0.0.0.0 --port ${PORT} --workers ${UVICORN_WORKERS}"]
